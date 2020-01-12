@@ -161,7 +161,7 @@ $(document).ready(function () {
     });
 });
 
-$("#userChoice").on("click", function () {
+$(".userChoice").on("click", function () {
     userInput = parseInt($(this).attr("multipleChoice"));
     console.log(userInput);
     if (userInput === selectedQuestion.answer){

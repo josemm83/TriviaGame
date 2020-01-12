@@ -64,3 +64,7 @@ img {
     height: 600px;
     background-color: rgb(17, 147, 199);
 }
+
+.userChoice:hover {
+    background-color: #ffffff;
+}
