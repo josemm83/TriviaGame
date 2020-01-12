@@ -2,12 +2,11 @@ var questions = [];
 var rightAnswer = 0;
 var wrongAnswer = 0;
 var timeOut = 0; 
-var userInput;
+var userInput = "";
 var counter = 0;
 var timer = 30;
 var running = false;
 var selectedQuestion;
-var choices;
 var intervalID;
 var limit = 5;
 var picture;
@@ -20,26 +19,37 @@ function randomQuestion(){
         var random = Math.floor(Math.random() * questions.length);
         selectedQuestion = questions[random];
         questions.splice(random, 1);
+        picture = selectedQuestion.pic;
         // console.log(selectedQuestion);
         $("#randomQuestion").html("<h2>" + selectedQuestion.q + "</h2>");
         for (var i = 0; i < selectedQuestion.choice.length; i++){
             var multipleChoice = $("<div>");
             multipleChoice.addClass("answerPick");
             multipleChoice.html(selectedQuestion.choice[i]);
-            
-            $("#choices").append(multipleChoice);
+            multipleChoice.attr("multipleChoice", i);
+            $("#log").append(multipleChoice);
         }
     }
 }
 
+function run(){
+    clearInterval(intervalID);
+    intervalID = setInterval(decrement, 1000);
+}
+
+function stop (){
+    clearInterval(intervalID);
+    running = false;
+}
+
 function decrement() {
-    clearInterval(timer);
-    $("#timer").html("<h3>Time Remaining: " + timer + " Seconds</h3>");
     timer --;
+    $("#timer").html("<h3>Time Remaining: " + timer + " Seconds</h3>");
     if (timer === 0) {
-      clearInterval(timer);
-      running = false;
+      stop();
       timeOut ++;
+      $("#log").html("<p>Time has expired, the correct answer was: " + 
+      selectedQuestion.choice[selectedQuestion.answer] + "</p>");
     //   alert("Time Up!");
     }
 }
@@ -52,9 +62,9 @@ function exitGame(){
 }
 
 function gameStart() {
+    run();
     running = true;
     randomQuestion();
-
 }
 
 $(document).ready(function () {
@@ -110,15 +120,35 @@ $(document).ready(function () {
         }];
     // console.log(questions);
     // console.log(questions.length);
+
+    $("#start").on("click", function () {
+        // console.log("clicked start");
+        $("#start").hide();
+        gameStart();
+    });
+
+    $("#reset").on("click", function () {
+        $("#reset").hide();
+        $("#log").empty();
+        $("randomQuestion").empty();
+        location.reset();
+    });
 });
 
-$("#start").on("click", function() {
-    $("#start").hide();
-    $("#reset").hide();
-    setInterval(decrement, 1000);
-    gameStart();
-});
+$(".answerPick").on("click", function () {
+    userInput = parseInt($(this).attr("multipleChoice"));
+    console.log(userInput);
+    if (userInput === selectedQuestion.answer){
+        stop();
+        rightAnswer ++;
+        userInput = "";
+        $("#log").html("<p>CORRECT!</P>");
+    }
+    else {
 
-$("#reset").on("click", function () {
-
+        wrongAnswer ++;
+        userInput = "";
+        $("#log").html("<p>Answer is incorrect! The correct answer is: " 
+        + selectedQuestion.choice[selectedQuestion.answer] + "</p>");
+    }
 });
